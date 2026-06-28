@@ -31,6 +31,10 @@ internal struct ViewmodelAnimKeyframe
     public Vector3 LeftHandEuler;
     public Vector3 RightHandOffset;
     public Vector3 RightHandEuler;
+    public Vector3 LeftForeArmOffset;
+    public Vector3 LeftForeArmEuler;
+    public Vector3 RightForeArmOffset;
+    public Vector3 RightForeArmEuler;
 
     internal static ViewmodelAnimKeyframe FromProfile(ViewmodelProfile profile, float time, float aim)
     {
@@ -57,6 +61,10 @@ internal struct ViewmodelAnimKeyframe
             LeftHandEuler = profile.LeftHandEuler,
             RightHandOffset = profile.RightHandOffset,
             RightHandEuler = profile.RightHandEuler,
+            LeftForeArmOffset = profile.LeftForeArmOffset,
+            LeftForeArmEuler = profile.LeftForeArmEuler,
+            RightForeArmOffset = profile.RightForeArmOffset,
+            RightForeArmEuler = profile.RightForeArmEuler,
         };
     }
 
@@ -85,6 +93,10 @@ internal struct ViewmodelAnimKeyframe
             LeftHandEuler = LeftHandEuler,
             RightHandOffset = RightHandOffset,
             RightHandEuler = RightHandEuler,
+            LeftForeArmOffset = LeftForeArmOffset,
+            LeftForeArmEuler = LeftForeArmEuler,
+            RightForeArmOffset = RightForeArmOffset,
+            RightForeArmEuler = RightForeArmEuler,
         };
     }
 
@@ -113,6 +125,10 @@ internal struct ViewmodelAnimKeyframe
             LeftHandEuler = Vector3.Lerp(a.LeftHandEuler, b.LeftHandEuler, t),
             RightHandOffset = Vector3.Lerp(a.RightHandOffset, b.RightHandOffset, t),
             RightHandEuler = Vector3.Lerp(a.RightHandEuler, b.RightHandEuler, t),
+            LeftForeArmOffset = Vector3.Lerp(a.LeftForeArmOffset, b.LeftForeArmOffset, t),
+            LeftForeArmEuler = Vector3.Lerp(a.LeftForeArmEuler, b.LeftForeArmEuler, t),
+            RightForeArmOffset = Vector3.Lerp(a.RightForeArmOffset, b.RightForeArmOffset, t),
+            RightForeArmEuler = Vector3.Lerp(a.RightForeArmEuler, b.RightForeArmEuler, t),
         };
     }
 }
@@ -120,6 +136,7 @@ internal struct ViewmodelAnimKeyframe
 internal sealed class ViewmodelAnimClip
 {
     internal string Name = "Custom";
+    internal string SourceClipName = string.Empty;
     internal float Duration = 0.5f;
     internal readonly List<ViewmodelAnimKeyframe> Keyframes = new();
 
@@ -175,6 +192,8 @@ internal sealed class ViewmodelAnimClip
         sb.AppendLine($"internal static ViewmodelAnimClip {fieldName} => new()");
         sb.AppendLine("{");
         sb.AppendLine($"    Name = \"{Name}\",");
+        if (!string.IsNullOrEmpty(SourceClipName))
+            sb.AppendLine($"    SourceClipName = \"{SourceClipName}\",");
         sb.AppendLine($"    Duration = {Format(Duration)}f,");
         sb.AppendLine("    Keyframes = new List<ViewmodelAnimKeyframe>");
         sb.AppendLine("    {");
@@ -198,7 +217,9 @@ internal sealed class ViewmodelAnimClip
                $"MapRaiseEquippablePosition = {FormatVector(k.MapRaiseEquippablePosition)}, MapRaiseEquippableEuler = {FormatVector(k.MapRaiseEquippableEuler)}, " +
                $"ThirdPersonPosition = {FormatVector(k.ThirdPersonPosition)}, ThirdPersonEuler = {FormatVector(k.ThirdPersonEuler)}, ThirdPersonWorldScale = {Format(k.ThirdPersonWorldScale)}f, " +
                $"LeftHandOffset = {FormatVector(k.LeftHandOffset)}, LeftHandEuler = {FormatVector(k.LeftHandEuler)}, " +
-               $"RightHandOffset = {FormatVector(k.RightHandOffset)}, RightHandEuler = {FormatVector(k.RightHandEuler)} " +
+               $"RightHandOffset = {FormatVector(k.RightHandOffset)}, RightHandEuler = {FormatVector(k.RightHandEuler)}, " +
+               $"LeftForeArmOffset = {FormatVector(k.LeftForeArmOffset)}, LeftForeArmEuler = {FormatVector(k.LeftForeArmEuler)}, " +
+               $"RightForeArmOffset = {FormatVector(k.RightForeArmOffset)}, RightForeArmEuler = {FormatVector(k.RightForeArmEuler)} " +
                "}";
     }
 

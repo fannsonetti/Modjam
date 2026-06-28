@@ -24,4 +24,9 @@ public sealed class ViewmodelEditorHost : MonoBehaviour
     {
         ViewmodelEditor.DrawGui();
     }
+
+    private void LateUpdate()
+    {
+        ViewmodelEditor.LateUpdatePreview();
+    }
 }

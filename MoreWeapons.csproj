@@ -167,6 +167,10 @@
 		<Compile Include="Utils\NukeCharredAvatar.cs" />
 		<Compile Include="Utils\MushroomCloudEffect.cs" />
 		<Compile Include="Utils\PlayerControlHelper.cs" />
+        <Compile Include="Utils\ViewmodelAvatarBoneHelper.cs" />
+        <Compile Include="Utils\ViewmodelTimelineGui.cs" />
+        <Compile Include="Utils\ViewmodelAnimatorClipResolver.cs" />
+        <Compile Include="Utils\ViewmodelAnimatorBuilder.cs" />
         <Compile Include="Utils\ViewmodelEditor.cs" />
         <Compile Include="Utils\ViewmodelEditorHost.cs" />
         <Compile Include="Utils\ViewmodelEditorFields.cs" />

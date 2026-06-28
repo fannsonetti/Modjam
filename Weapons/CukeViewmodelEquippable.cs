@@ -61,6 +61,19 @@ public abstract class CukeViewmodelEquippable : Equippable_Viewmodel
             profile.ApplyFloatingModelTransform(_viewmodel.transform);
     }
 
+    internal void EditorSyncLiveViewmodel(ref ViewmodelProfile profile)
+    {
+        profile.EquippableLocalPosition = transform.localPosition;
+        profile.EquippableLocalEuler = transform.localEulerAngles;
+        EnsureViewmodel();
+        if (_viewmodel == null)
+            return;
+
+        profile.ModelLocalPosition = _viewmodel.transform.localPosition;
+        profile.ModelLocalEuler = _viewmodel.transform.localRotation.eulerAngles;
+        profile.ModelUniformScale = _viewmodel.transform.localScale.x;
+    }
+
     /// <summary>
     /// Bakes profile pose onto the registry prefab so inventory / slot previews use equippable rotation.
     /// </summary>
@@ -117,6 +130,7 @@ public abstract class CukeViewmodelEquippable : Equippable_Viewmodel
         if (ActiveEquipped == this)
             ActiveEquipped = null;
 
+        ViewmodelEditor.ClearSession(this);
         DestroyViewmodel();
 
 #if IL2CPP

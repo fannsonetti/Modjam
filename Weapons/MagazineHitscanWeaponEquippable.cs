@@ -47,7 +47,14 @@ public abstract class MagazineHitscanWeaponEquippable : PlaceholderAvatarWeaponE
     protected float ReloadStartTime = 1.5f;
     protected float ReloadEndTime;
     protected string ReloadStartAnimTrigger = "MagazineReload";
+    protected string ReloadIndividualAnimTrigger = string.Empty;
     protected string ReloadEndAnimTrigger = string.Empty;
+
+    internal override string EditorReloadStartAnimTrigger => ReloadStartAnimTrigger;
+
+    internal override string EditorReloadIndividualAnimTrigger => ReloadIndividualAnimTrigger;
+
+    internal override string EditorReloadEndAnimTrigger => ReloadEndAnimTrigger;
 
     protected AudioSourceController FireSound;
     protected AudioSourceController EmptySound;
@@ -91,6 +98,7 @@ public abstract class MagazineHitscanWeaponEquippable : PlaceholderAvatarWeaponE
         ReloadStartTime = template.ReloadStartTime;
         ReloadEndTime = template.ReloadEndTime;
         ReloadStartAnimTrigger = template.ReloadStartAnimTrigger;
+        ReloadIndividualAnimTrigger = template.ReloadIndividualAnimTrigger;
         ReloadEndAnimTrigger = template.ReloadEndAnimTrigger;
     }
 

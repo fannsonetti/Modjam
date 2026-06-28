@@ -92,6 +92,16 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
     private Vector3 _viewmodelHipLocalPosition;
     protected IntegerItemInstance WeaponItem;
     protected string[] FireAnimTriggers;
+
+    internal string[] EditorFireAnimTriggers => FireAnimTriggers;
+
+    internal virtual string EditorReloadStartAnimTrigger => string.Empty;
+
+    internal virtual string EditorReloadIndividualAnimTrigger => string.Empty;
+
+    internal virtual string EditorReloadEndAnimTrigger => string.Empty;
+
+    internal virtual string EditorCockAnimTrigger => string.Empty;
     private bool _templateApplied;
     protected float TimeSinceFire = 1000f;
     protected float TimeEquipped;
@@ -127,18 +137,38 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
 
     internal bool SupportsMapRaisePoseEditor => SupportsMapRaisePose;
 
+    internal void EditorEnsureVisible()
+    {
+        gameObject.SetActive(true);
+        EnsureViewmodel();
+
+        if (_viewmodel != null)
+        {
+            _viewmodel.SetActive(true);
+            foreach (var renderer in _viewmodel.GetComponentsInChildren<Renderer>(true))
+                renderer.enabled = true;
+        }
+
+        var avatar = Singleton<ViewmodelAvatar>.Instance;
+        if (avatar != null)
+        {
+            avatar.SetVisibility(true);
+            avatar.Animator?.SetFloat("Aim", GetViewmodelAimAmount());
+        }
+    }
+
     internal void EditorApplyProfile(ViewmodelProfile profile, bool applyAvatarOffsets)
     {
+        EditorEnsureVisible();
+
         if (UsesAvatarHands)
         {
+            EnsureViewmodel();
             if (_viewmodel != null)
             {
                 WeaponGlbLoader.ApplyViewmodelProfile(_viewmodel, profile);
                 _viewmodelHipLocalPosition = profile.HipPosition;
             }
-
-            if (applyAvatarOffsets)
-                ViewmodelAvatarHandHelper.ApplyOffsets(profile);
 
             UpdateViewmodelAim();
             return;
@@ -161,10 +191,53 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
     protected float GetViewmodelAimAmount() =>
         ViewmodelEditor.IsBoundTo(this) ? ViewmodelEditor.PreviewAim : _aim;
 
+    internal float EditorLiveAimAmount => _aim;
+
+    internal void EditorSyncLiveViewmodel(ref ViewmodelProfile profile)
+    {
+        if (UsesAvatarHands)
+        {
+            EnsureViewmodel();
+            if (_viewmodel == null)
+                return;
+
+            var t = _viewmodel.transform;
+            var aim = _aim;
+            if (aim <= 0.01f)
+            {
+                profile.HipPosition = t.localPosition;
+                profile.HipEuler = t.localRotation.eulerAngles;
+            }
+            else
+            {
+                profile.HipPosition = t.localPosition - profile.GetAimPositionOffset(aim);
+            }
+
+            profile.UniformScale = t.localScale.x;
+            _viewmodelHipLocalPosition = profile.HipPosition;
+            return;
+        }
+
+        profile.EquippableLocalPosition = transform.localPosition;
+        profile.EquippableLocalEuler = transform.localEulerAngles;
+        if (_viewmodel != null)
+        {
+            profile.ModelLocalPosition = _viewmodel.transform.localPosition;
+            profile.ModelLocalEuler = _viewmodel.transform.localRotation.eulerAngles;
+            profile.ModelUniformScale = _viewmodel.transform.localScale.x;
+        }
+    }
+
     private void ApplyAvatarHandOffsets(ViewmodelProfile profile)
     {
-        ViewmodelAvatarHandHelper.ApplyOffsets(profile);
+        ViewmodelAvatarBoneHelper.ApplyBoneOverrides(profile);
     }
+
+    private static bool ProfileHasBoneOverrides(ViewmodelProfile profile) =>
+        profile.LeftHandOffset != Vector3.zero || profile.LeftHandEuler != Vector3.zero
+        || profile.RightHandOffset != Vector3.zero || profile.RightHandEuler != Vector3.zero
+        || profile.LeftForeArmOffset != Vector3.zero || profile.LeftForeArmEuler != Vector3.zero
+        || profile.RightForeArmOffset != Vector3.zero || profile.RightForeArmEuler != Vector3.zero;
 
     protected GameObject CreateGlbViewmodel(string embeddedResourceName, string relativePathFromModDir, string objectName)
     {
@@ -343,6 +416,7 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
         if (ActiveEquipped == this)
             ActiveEquipped = null;
 
+        ViewmodelEditor.ClearSession(this);
         ViewmodelAvatarHandHelper.Reset();
         OnStopAim();
         StopAim();
@@ -431,6 +505,7 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
 
         if (editorBound)
         {
+            EditorEnsureVisible();
             UpdateViewmodelAim();
             return;
         }
@@ -469,6 +544,8 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
             Singleton<ViewmodelAvatar>.Instance.SetVisibility(true);
         else if (!UsesAvatarHands)
             Singleton<ViewmodelAvatar>.Instance.SetVisibility(false);
+        else if (ViewmodelEditor.IsBoundTo(this))
+            Singleton<ViewmodelAvatar>.Instance.SetVisibility(true);
 
         if (!UsesAvatarHands)
             ApplyFloatingPresentation();
@@ -686,8 +763,11 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
 
         if (_viewmodel != null && UsesAvatarHands)
         {
+            var profile = ActiveProfile;
+            _viewmodelHipLocalPosition = profile.HipPosition;
             _viewmodel.transform.localRotation = GetViewmodelAimRotation(aim);
-            _viewmodel.transform.localPosition = _viewmodelHipLocalPosition + GetViewmodelAimPositionOffset(aim);
+            _viewmodel.transform.localPosition = profile.HipPosition + GetViewmodelAimPositionOffset(aim);
+            _viewmodel.transform.localScale = Vector3.one * profile.UniformScale;
         }
     }
 

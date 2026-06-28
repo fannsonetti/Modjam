@@ -14,11 +14,16 @@ namespace MoreWeapons.Utils;
 
 internal static class ViewmodelAvatarBoneHelper
 {
+    private static readonly string[] LeftHandNames = { "mixamorig:LeftHand", "LeftHand" };
+    private static readonly string[] RightHandNames = { "mixamorig:RightHand", "RightHand" };
+    private static readonly string[] LeftForeArmNames = { "mixamorig:LeftForeArm", "LeftForeArm", "LeftForearm" };
+    private static readonly string[] RightForeArmNames = { "mixamorig:RightForeArm", "RightForeArm", "RightForearm" };
+
     private static Animator _animator;
-    private static RuntimeAnimatorController _originalController;
-    private static RuntimeAnimatorController _editController;
+    private static GameObject _sampleRoot;
     private static bool _sessionActive;
     private static float _savedAnimatorSpeed = 1f;
+    private static AnimatorUpdateMode _savedUpdateMode = AnimatorUpdateMode.Normal;
 
     private static Transform _leftHand;
     private static Transform _rightHand;
@@ -26,14 +31,28 @@ internal static class ViewmodelAvatarBoneHelper
     private static Transform _rightForeArm;
 
     internal static bool HasSession => _sessionActive;
-
     internal static Animator Animator => _animator;
+    internal static string ResolvedBoneStatus { get; private set; } = "Bones not resolved";
 
-    internal static RuntimeAnimatorController OriginalController => _originalController;
+    internal static GameObject GetSampleRoot()
+    {
+        if (_sampleRoot != null)
+            return _sampleRoot;
 
-    internal static RuntimeAnimatorController EditController => _editController;
+        var avatar = Singleton<ViewmodelAvatar>.Instance;
+        if (avatar == null)
+            return null;
 
-    internal static void BeginEditorSession(RuntimeAnimatorController weaponController)
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        var type = avatar.GetType();
+        var body = type.GetProperty("BodyContainer", flags)?.GetValue(avatar) as Transform
+            ?? type.GetField("BodyContainer", flags)?.GetValue(avatar) as Transform;
+
+        _sampleRoot = body != null ? body.gameObject : avatar.gameObject;
+        return _sampleRoot;
+    }
+
+    internal static void BeginEditorSession()
     {
         EndEditorSession();
 
@@ -45,18 +64,12 @@ internal static class ViewmodelAvatarBoneHelper
         if (_animator == null)
             return;
 
-        ResolveBones(avatar);
-        _originalController = _animator.runtimeAnimatorController;
-
-        var source = weaponController != null ? weaponController : _originalController;
-        if (source != null)
-        {
-            _editController = Object.Instantiate(source);
-            _editController.name = source.name + "_ViewmodelEditor";
-            _animator.runtimeAnimatorController = _editController;
-        }
+        ResolveBones(_animator);
+        GetSampleRoot();
 
         _savedAnimatorSpeed = _animator.speed;
+        _savedUpdateMode = _animator.updateMode;
+        _animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         _animator.speed = 0f;
         _animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         _sessionActive = true;
@@ -67,23 +80,17 @@ internal static class ViewmodelAvatarBoneHelper
         if (_animator != null)
         {
             _animator.speed = _savedAnimatorSpeed;
-            if (_originalController != null)
-                _animator.runtimeAnimatorController = _originalController;
-        }
-
-        if (_editController != null)
-        {
-            Object.Destroy(_editController);
-            _editController = null;
+            _animator.updateMode = _savedUpdateMode;
         }
 
         _sessionActive = false;
-        _originalController = null;
         _animator = null;
+        _sampleRoot = null;
         _leftHand = null;
         _rightHand = null;
         _leftForeArm = null;
         _rightForeArm = null;
+        ResolvedBoneStatus = "Bones not resolved";
     }
 
     internal static void EvaluatePose(float aimAmount)
@@ -95,22 +102,23 @@ internal static class ViewmodelAvatarBoneHelper
         _animator.Update(0f);
     }
 
-    internal static void ApplyBoneOverrides(ViewmodelProfile profile, float aimAmount)
+    internal static void SampleClip(AnimationClip clip, float timeSeconds)
     {
-        if (_animator == null)
-        {
-            var avatar = Singleton<ViewmodelAvatar>.Instance;
-            if (avatar == null)
-                return;
-
-            _animator = GetAnimator(avatar);
-            ResolveBones(avatar);
-        }
-
-        if (_animator == null)
+        if (clip == null)
             return;
 
-        EvaluatePose(aimAmount);
+        var root = GetSampleRoot();
+        if (root == null)
+            return;
+
+        clip.SampleAnimation(root, timeSeconds);
+    }
+
+    internal static void ApplyBoneOverrides(ViewmodelProfile profile)
+    {
+        if (!EnsureBonesResolved())
+            return;
+
         ApplyOffset(_leftHand, profile.LeftHandOffset, profile.LeftHandEuler);
         ApplyOffset(_rightHand, profile.RightHandOffset, profile.RightHandEuler);
         ApplyOffset(_leftForeArm, profile.LeftForeArmOffset, profile.LeftForeArmEuler);
@@ -119,7 +127,6 @@ internal static class ViewmodelAvatarBoneHelper
 
     internal static void CaptureIntoProfile(ref ViewmodelProfile profile)
     {
-        EvaluatePose(0f);
         profile.LeftHandOffset = ReadOffset(_leftHand);
         profile.LeftHandEuler = ReadEuler(_leftHand);
         profile.RightHandOffset = ReadOffset(_rightHand);
@@ -135,7 +142,7 @@ internal static class ViewmodelAvatarBoneHelper
         if (source == null)
             return null;
 
-        var clone = Object.Instantiate(source);
+        var clone = UnityEngine.Object.Instantiate(source);
         clone.name = name;
         return clone;
     }
@@ -172,34 +179,71 @@ internal static class ViewmodelAvatarBoneHelper
         return body != null ? body.GetComponentInChildren<Animator>(true) : null;
     }
 
-    private static void ResolveBones(object avatar)
+    private static bool EnsureBonesResolved()
     {
-        const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        var type = avatar.GetType();
-        var body = type.GetProperty("BodyContainer", flags)?.GetValue(avatar) as Transform
-            ?? type.GetField("BodyContainer", flags)?.GetValue(avatar) as Transform;
+        if (_leftHand != null || _rightHand != null || _leftForeArm != null || _rightForeArm != null)
+            return true;
 
-        if (body == null)
-            return;
+        var avatar = Singleton<ViewmodelAvatar>.Instance;
+        if (avatar == null)
+            return false;
 
-        var transforms = body.GetComponentsInChildren<Transform>(true);
-        _leftHand = FindBone(transforms, "LeftHand");
-        _rightHand = FindBone(transforms, "RightHand");
-        _leftForeArm = FindBone(transforms, "LeftForeArm", "LeftForearm");
-        _rightForeArm = FindBone(transforms, "RightForeArm", "RightForearm");
+        var animator = GetAnimator(avatar);
+        if (animator == null)
+            return false;
+
+        ResolveBones(animator);
+        return _leftHand != null || _rightHand != null || _leftForeArm != null || _rightForeArm != null;
     }
 
-    private static Transform FindBone(IList<Transform> transforms, params string[] nameFragments)
+    private static void ResolveBones(Animator animator)
     {
-        foreach (var fragment in nameFragments)
+        _leftHand = GetHumanoidOrNamedBone(animator, HumanBodyBones.LeftHand, LeftHandNames);
+        _rightHand = GetHumanoidOrNamedBone(animator, HumanBodyBones.RightHand, RightHandNames);
+        _leftForeArm = GetHumanoidOrNamedBone(animator, HumanBodyBones.LeftLowerArm, LeftForeArmNames);
+        _rightForeArm = GetHumanoidOrNamedBone(animator, HumanBodyBones.RightLowerArm, RightForeArmNames);
+
+        ResolvedBoneStatus =
+            $"LHand={NameOf(_leftHand)} RHand={NameOf(_rightHand)} " +
+            $"LFore={NameOf(_leftForeArm)} RFore={NameOf(_rightForeArm)}";
+    }
+
+    private static Transform GetHumanoidOrNamedBone(Animator animator, HumanBodyBones humanBone, string[] names)
+    {
+        if (animator.isHuman)
+        {
+            var human = animator.GetBoneTransform(humanBone);
+            if (human != null)
+                return human;
+        }
+
+        var root = animator.transform;
+        var transforms = root.GetComponentsInChildren<Transform>(true);
+        foreach (var exact in names)
         {
             foreach (var transform in transforms)
             {
-                if (transform.name.IndexOf(fragment, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                if (transform.name == exact)
+                    return transform;
+            }
+        }
+
+        foreach (var fragment in names)
+        {
+            foreach (var transform in transforms)
+            {
+                var name = transform.name;
+                if (name.IndexOf("Container", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    continue;
+                if (name.IndexOf("Alignment", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    continue;
+                if (name.IndexOf(fragment, System.StringComparison.OrdinalIgnoreCase) >= 0)
                     return transform;
             }
         }
 
         return null;
     }
+
+    private static string NameOf(Transform bone) => bone != null ? bone.name : "missing";
 }

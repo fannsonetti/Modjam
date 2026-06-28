@@ -30,6 +30,10 @@ internal struct ViewmodelProfile
     public Vector3 LeftHandEuler;
     public Vector3 RightHandOffset;
     public Vector3 RightHandEuler;
+    public Vector3 LeftForeArmOffset;
+    public Vector3 LeftForeArmEuler;
+    public Vector3 RightForeArmOffset;
+    public Vector3 RightForeArmEuler;
 
     internal bool IsFloating => PresentationMode == ViewmodelPresentationMode.Floating;
 
@@ -128,6 +132,10 @@ internal struct ViewmodelProfile
         LeftHandEuler = LeftHandEuler,
         RightHandOffset = RightHandOffset,
         RightHandEuler = RightHandEuler,
+        LeftForeArmOffset = LeftForeArmOffset,
+        LeftForeArmEuler = LeftForeArmEuler,
+        RightForeArmOffset = RightForeArmOffset,
+        RightForeArmEuler = RightForeArmEuler,
     };
 
     internal string ToCSharpSnippet(string fieldName)
@@ -162,6 +170,10 @@ internal struct ViewmodelProfile
             if (LeftHandEuler != Vector3.zero) AppendVector(sb, "LeftHandEuler", LeftHandEuler);
             if (RightHandOffset != Vector3.zero) AppendVector(sb, "RightHandOffset", RightHandOffset);
             if (RightHandEuler != Vector3.zero) AppendVector(sb, "RightHandEuler", RightHandEuler);
+            if (LeftForeArmOffset != Vector3.zero) AppendVector(sb, "LeftForeArmOffset", LeftForeArmOffset);
+            if (LeftForeArmEuler != Vector3.zero) AppendVector(sb, "LeftForeArmEuler", LeftForeArmEuler);
+            if (RightForeArmOffset != Vector3.zero) AppendVector(sb, "RightForeArmOffset", RightForeArmOffset);
+            if (RightForeArmEuler != Vector3.zero) AppendVector(sb, "RightForeArmEuler", RightForeArmEuler);
         }
 
         AppendVector(sb, "ThirdPersonPosition", ThirdPersonPosition);

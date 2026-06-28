@@ -1,0 +1,29 @@
+---
+description: Allowed dependencies and reference mods for Modjam
+alwaysApply: true
+---
+
+# Modjam — Allowed Dependencies & References
+
+## Allowed dependencies
+
+Use these frameworks as the primary modding stack. Prefer their abstractions over direct game assembly bindings.
+
+| Package | Docs | Purpose |
+|---------|------|---------|
+| **S1API** | https://ifbars.github.io/S1API/index.html | Cross-compatible Schedule One modding (Mono + IL2CPP): NPCs, quests, items, phone apps, save data, lifecycle hooks |
+| **S1MAPI** | https://ifbars.github.io/S1MAPI/index.html | Procedural geometry, building system, runtime GLTF/GLB loading |
+
+Do not introduce other third-party modding frameworks unless the user explicitly approves them.
+
+## Reference mods (implementation only)
+
+The user’s prior mods live at `D:\Vibecoded\ScheduleOne\`. You may read their source for patterns and implementation ideas:
+
+- `More-NPCs`
+- `S1-Thors-Hammer`
+- `WeaponShipments`
+
+**Brainstorming:** Do **not** use these mods as inspiration when ideating features, themes, or scope. Treat them as code references only after direction is set.
+
+**Implementation:** When building, match conventions found in those projects (project layout, S1API usage, build setup) where appropriate.

@@ -1,0 +1,426 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>MoreWeapons</RootNamespace>
+		<LangVersion>default</LangVersion>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<Configurations>Mono;Il2cpp;CrossCompat</Configurations>
+		<NoWarn>$(NoWarn);MSB3277</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Il2cpp'">
+		<TargetFramework>net6.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'!='Il2cpp'">
+		<TargetFramework>netstandard2.1</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Mono'">
+		<GamePath>D:\Schedule 1 Dependencies\Mono</GamePath>
+		<ManagedPath>$(GamePath)\Schedule I_Data\Managed</ManagedPath>
+		<MelonLoaderPath>$(GamePath)\MelonLoader\net35</MelonLoaderPath>
+		<ModsPath>$(GamePath)\Mods</ModsPath>
+		<DefineConstants>MONO</DefineConstants>
+		<AssemblyName>MoreWeapons_mono</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Il2cpp'">
+		<GamePath>D:\Schedule 1 Dependencies\Il2cpp</GamePath>
+		<ManagedPath>$(GamePath)\MelonLoader\Il2CppAssemblies</ManagedPath>
+		<MelonLoaderPath>$(GamePath)\MelonLoader\net6</MelonLoaderPath>
+		<ModsPath>$(GamePath)\Mods</ModsPath>
+		<DefineConstants>IL2CPP</DefineConstants>
+		<AssemblyName>MoreWeapons_il2cpp</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='CrossCompat'">
+		<GamePath>D:\Schedule 1 Dependencies\Mono</GamePath>
+		<ManagedPath>$(GamePath)\Schedule I_Data\Managed</ManagedPath>
+		<MelonLoaderPath>$(GamePath)\MelonLoader\net35</MelonLoaderPath>
+		<ModsPath>$(GamePath)\Mods</ModsPath>
+		<DefineConstants>CROSS_COMPAT</DefineConstants>
+		<AssemblyName>MoreWeapons</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<UsePublicized>false</UsePublicized>
+		<UseLocalS1API>true</UseLocalS1API>
+		<S1APILocalPath>D:\Schedule 1 Dependencies\S1API\S1API.Mono.MelonLoader.dll</S1APILocalPath>
+		<S1APIIl2CppPath>D:\Schedule 1 Dependencies\S1API\S1API.Il2Cpp.MelonLoader.dll</S1APIIl2CppPath>
+		<S1MAPIMonoPath>D:\Schedule 1 Dependencies\S1MAPI\S1MAPI_Mono.dll</S1MAPIMonoPath>
+		<S1MAPIIl2CppPath>D:\Schedule 1 Dependencies\S1MAPI\S1MAPI_Il2Cpp.dll</S1MAPIIl2CppPath>
+		<!-- Runtime: MelonLoader resolves S1MAPI from the installed mod's UserLibs folder, not from this output. -->
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Mono'">
+		<Reference Include="S1MAPI"><HintPath>$(S1MAPIMonoPath)</HintPath><Private>False</Private></Reference>
+		<Reference Include="com.rlabrecque.steamworks.net"><HintPath>$(ManagedPath)\com.rlabrecque.steamworks.net.dll</HintPath></Reference>
+		<Reference Include="FishNet.Runtime"><HintPath>$(ManagedPath)\FishNet.Runtime.dll</HintPath></Reference>
+		<Reference Include="ScheduleOne.Core"><HintPath>$(ManagedPath)\ScheduleOne.Core.dll</HintPath></Reference>
+		<Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.AnimationModule"><HintPath>$(ManagedPath)\UnityEngine.AnimationModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedPath)\UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.PhysicsModule"><HintPath>$(ManagedPath)\UnityEngine.PhysicsModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedPath)\UnityEngine.InputLegacyModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedPath)\UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.IMGUIModule"><HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedPath)\UnityEngine.ImageConversionModule.dll</HintPath></Reference>
+		<Reference Include="Assembly-CSharp"><HintPath>$(ManagedPath)\Assembly-CSharp.dll</HintPath></Reference>
+		<Reference Include="MelonLoader"><HintPath>$(MelonLoaderPath)\MelonLoader.dll</HintPath></Reference>
+		<Reference Include="0Harmony"><HintPath>$(MelonLoaderPath)\0Harmony.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='CrossCompat'">
+		<Reference Include="S1MAPI"><HintPath>$(S1MAPIMonoPath)</HintPath><Private>False</Private></Reference>
+		<Reference Include="com.rlabrecque.steamworks.net"><HintPath>$(ManagedPath)\com.rlabrecque.steamworks.net.dll</HintPath></Reference>
+		<Reference Include="FishNet.Runtime"><HintPath>$(ManagedPath)\FishNet.Runtime.dll</HintPath></Reference>
+		<Reference Include="ScheduleOne.Core"><HintPath>$(ManagedPath)\ScheduleOne.Core.dll</HintPath></Reference>
+		<Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.AnimationModule"><HintPath>$(ManagedPath)\UnityEngine.AnimationModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedPath)\UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.PhysicsModule"><HintPath>$(ManagedPath)\UnityEngine.PhysicsModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedPath)\UnityEngine.InputLegacyModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedPath)\UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.IMGUIModule"><HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedPath)\UnityEngine.ImageConversionModule.dll</HintPath></Reference>
+		<Reference Include="Assembly-CSharp"><HintPath>$(ManagedPath)\Assembly-CSharp.dll</HintPath></Reference>
+		<Reference Include="MelonLoader"><HintPath>$(MelonLoaderPath)\MelonLoader.dll</HintPath></Reference>
+		<Reference Include="0Harmony"><HintPath>$(MelonLoaderPath)\0Harmony.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Il2cpp'">
+		<Reference Include="S1MAPI"><HintPath>$(S1MAPIIl2CppPath)</HintPath><Private>False</Private></Reference>
+		<Reference Include="Assembly-CSharp"><HintPath>$(ManagedPath)\Assembly-CSharp.dll</HintPath></Reference>
+		<Reference Include="Il2CppFishNet.Runtime"><HintPath>$(ManagedPath)\Il2CppFishNet.Runtime.dll</HintPath></Reference>
+		<Reference Include="Il2CppScheduleOne.Core"><HintPath>$(ManagedPath)\Il2CppScheduleOne.Core.dll</HintPath></Reference>
+		<Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedPath)\Unity.TextMeshPro.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.AnimationModule"><HintPath>$(ManagedPath)\UnityEngine.AnimationModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedPath)\UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.PhysicsModule"><HintPath>$(ManagedPath)\UnityEngine.PhysicsModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedPath)\UnityEngine.InputLegacyModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.IMGUIModule"><HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath></Reference>
+		<Reference Include="Il2Cppmscorlib"><HintPath>$(ManagedPath)\Il2Cppmscorlib.dll</HintPath></Reference>
+		<Reference Include="MelonLoader"><HintPath>$(MelonLoaderPath)\MelonLoader.dll</HintPath></Reference>
+		<Reference Include="0Harmony"><HintPath>$(MelonLoaderPath)\0Harmony.dll</HintPath></Reference>
+		<Reference Include="Il2CppInterop.Runtime"><HintPath>$(MelonLoaderPath)\Il2CppInterop.Runtime.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(UseLocalS1API)' == 'true' And '$(Configuration)'=='Il2cpp'">
+		<Reference Include="S1API.Forked">
+			<HintPath>$(S1APIIl2CppPath)</HintPath>
+			<Private>True</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(UseLocalS1API)' == 'true' And '$(Configuration)'!='Il2cpp'">
+		<Reference Include="S1API.Forked">
+			<HintPath>$(S1APILocalPath)</HintPath>
+			<Private>True</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="Core.cs" />
+		<Compile Include="Patches\AvatarAnimationCullingGuardPatch.cs" />
+		<Compile Include="Patches\CoweringBehaviourGuardPatch.cs" />
+		<Compile Include="Utils\Constants.cs" />
+		<Compile Include="Utils\ExplosionVehiclePush.cs" />
+		<Compile Include="Utils\ItemRegistration.cs" />
+		<Compile Include="Utils\RocketVfx.cs" />
+		<Compile Include="Utils\S1ApiHelpers.cs" />
+		<Compile Include="Utils\ModAssetLoader.cs" />
+		<Compile Include="Utils\TgaLoader.cs" />
+		<Compile Include="Utils\VfxFlipbookCatalog.cs" />
+		<Compile Include="Utils\ScopeOverlay.cs" />
+		<Compile Include="Utils\ScopeHudHelper.cs" />
+		<Compile Include="Utils\ScopeMouseSensitivity.cs" />
+		<Compile Include="Utils\ScopeNpcTargeting.cs" />
+		<Compile Include="Utils\WeaponAudioUtility.cs" />
+		<Compile Include="Utils\WeaponGlbLoader.cs" />
+		<Compile Include="Utils\WeaponCombatUtility.cs" />
+		<Compile Include="Utils\ThrowableWeaponUtility.cs" />
+        <Compile Include="Utils\ViewmodelProfile.cs" />
+        <Compile Include="Utils\ViewmodelPresentationMode.cs" />
+		<Compile Include="Utils\ViewmodelAvatarHandHelper.cs" />
+		<Compile Include="Utils\HandsFreeViewmodelSettings.cs" />
+		<Compile Include="Utils\MagazineGlbCatalog.cs" />
+		<Compile Include="Utils\NukeBlastVfx.cs" />
+		<Compile Include="Utils\NukeMapCoordinates.cs" />
+        <Compile Include="Utils\NukeMapOverlay.cs" />
+        <Compile Include="Utils\UiInputBlocker.cs" />
+        <Compile Include="Utils\MeshRenderHelper.cs" />
+        <Compile Include="Utils\ViewmodelMountHelper.cs" />
+        <Compile Include="Utils\NukeBallistics.cs" />
+        <Compile Include="Utils\NukeManorDetonation.cs" />
+        <Compile Include="Utils\NukeStrikeBilling.cs" />
+        <Compile Include="NPCs\NukeStrikeContact.cs" />
+        <Compile Include="Utils\NukeStrikeController.cs" />
+		<Compile Include="Utils\NukePlayerDamage.cs" />
+		<Compile Include="Utils\NukeNpcEffects.cs" />
+		<Compile Include="Utils\NukeCharredAvatar.cs" />
+		<Compile Include="Utils\MushroomCloudEffect.cs" />
+		<Compile Include="Utils\PlayerControlHelper.cs" />
+        <Compile Include="Utils\ViewmodelEditor.cs" />
+        <Compile Include="Utils\ViewmodelEditorHost.cs" />
+        <Compile Include="Utils\ViewmodelEditorFields.cs" />
+        <Compile Include="Utils\ImGuiSkinHelper.cs" />
+        <Compile Include="Utils\ViewmodelAnimClip.cs" />
+        <Compile Include="Utils\WeaponViewmodelProfiles.cs" />
+		<Compile Include="Utils\GrenadeProjectileSetup.cs" />
+		<Compile Include="Utils\ParticleMaterialHelper.cs" />
+		<Compile Include="Utils\ProceduralVisualFactory.cs" />
+		<Compile Include="Utils\SmokeCloudEffect.cs" />
+		<Compile Include="Utils\WeaponPreferences.cs" />
+		<Compile Include="Utils\WeaponRanks.cs" />
+		<Compile Include="Utils\FlashbangEffect.cs" />
+		<Compile Include="Utils\FlashbangScreenEffect.cs" />
+		<Compile Include="Weapons\CukeViewmodelEquippable.cs" />
+		<Compile Include="Weapons\CukeThrowableEquippable.cs" />
+		<Compile Include="Weapons\PlaceholderAvatarWeaponEquippable.cs" />
+		<Compile Include="Weapons\MagazineEquippable.cs" />
+		<Compile Include="Weapons\MagazineHitscanWeaponEquippable.cs" />
+		<Compile Include="Weapons\RocketLauncherEquippable.cs" />
+		<Compile Include="Weapons\Ak47Equippable.cs" />
+		<Compile Include="Weapons\SniperEquippable.cs" />
+		<Compile Include="Weapons\GrenadeEquippable.cs" />
+		<Compile Include="Weapons\GrenadeProjectile.cs" />
+		<Compile Include="Weapons\FlashbangEquippable.cs" />
+		<Compile Include="Weapons\FlashbangProjectile.cs" />
+		<Compile Include="Weapons\SmokeGrenadeEquippable.cs" />
+		<Compile Include="Weapons\SmokeGrenadeProjectile.cs" />
+		<Compile Include="Weapons\M4a1Equippable.cs" />
+		<Compile Include="Weapons\DrumGunEquippable.cs" />
+		<Compile Include="Weapons\NukeRemoteEquippable.cs" />
+		<Compile Include="Weapons\NukeBomberPlane.cs" />
+		<Compile Include="Weapons\NukeProjectile.cs" />
+		<Compile Include="Weapons\RocketProjectile.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\UI\sniper_scope_overlay.png" />
+		<EmbeddedResource Include="Assets\UI\Map_Full.png" />
+		<EmbeddedResource Include="Assets\Models\ak47.glb" />
+		<EmbeddedResource Include="Assets\Models\sniper.glb" />
+		<EmbeddedResource Include="Assets\Models\m4a1.glb" />
+		<EmbeddedResource Include="Assets\Models\flashbang.glb" />
+		<EmbeddedResource Include="Assets\Models\rocket.glb" />
+		<EmbeddedResource Include="Assets\Models\rocket_launcher_loaded.glb" />
+		<EmbeddedResource Include="Assets\Models\rocket_launcher_unloaded.glb" />
+		<EmbeddedResource Include="Assets\Models\smoke_grenade.glb" />
+		<EmbeddedResource Include="Assets\Models\grenade.glb" />
+		<EmbeddedResource Include="Assets\Models\plane.glb" />
+		<EmbeddedResource Include="Assets\Models\rdu.glb" />
+		<EmbeddedResource Include="Assets\Models\drumgun.glb" />
+		<EmbeddedResource Include="Assets\Models\drum.glb" />
+		<EmbeddedResource Include="Assets\Models\ak47_mag.glb" />
+		<EmbeddedResource Include="Assets\Models\m4a1_mag.glb" />
+		<EmbeddedResource Include="Assets\Models\sniper_mag.glb" />
+		<EmbeddedResource Include="Assets\Icons\drumgun.png" />
+		<EmbeddedResource Include="Assets\Icons\drum.png" />
+		<EmbeddedResource Include="Assets\Icons\unknown_contact.png" />
+		<EmbeddedResource Include="Assets\Icons\ak47.png" />
+		<EmbeddedResource Include="Assets\Icons\ak47_mag.png" />
+		<EmbeddedResource Include="Assets\Icons\sniper.png" />
+		<EmbeddedResource Include="Assets\Icons\sniper_mag.png" />
+		<EmbeddedResource Include="Assets\Icons\m4a1.png" />
+		<EmbeddedResource Include="Assets\Icons\m4a1_mag.png" />
+		<EmbeddedResource Include="Assets\Icons\flashbang.png" />
+		<EmbeddedResource Include="Assets\Icons\rocket.png" />
+		<EmbeddedResource Include="Assets\Icons\rocket_launcher.png" />
+		<EmbeddedResource Include="Assets\Icons\smoke_grenade.png" />
+		<EmbeddedResource Include="Assets\Icons\grenade.png" />
+		<EmbeddedResource Include="Assets\Icons\rdu.png" />
+		<EmbeddedResource Include="Assets\VFX\WispySmoke01_8x8.tga" />
+		<EmbeddedResource Include="Assets\VFX\WispySmoke03_8x8.tga" />
+		<EmbeddedResource Include="Assets\VFX\FireBall02_8x8.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion00_5x5.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion01_5x5.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion01-light_5x5.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion01-nofire_5x5.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion01-light-nofire_5x5.tga" />
+		<EmbeddedResource Include="Assets\VFX\Explosion02_5x5.tga" />
+		<None Include="Assets\Models\grenade.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\grenade.glb</Link>
+		</None>
+		<None Include="Assets\Icons\grenade.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\grenade.png</Link>
+		</None>
+		<None Include="Assets\UI\Map_Full.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\UI\Map_Full.png</Link>
+		</None>
+		<None Include="Assets\UI\sniper_scope_overlay.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\UI\sniper_scope_overlay.png</Link>
+		</None>
+		<None Include="Assets\Models\ak47.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\ak47.glb</Link>
+		</None>
+		<None Include="Assets\Models\sniper.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\sniper.glb</Link>
+		</None>
+		<None Include="Assets\Models\m4a1.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\m4a1.glb</Link>
+		</None>
+		<None Include="Assets\Models\flashbang.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\flashbang.glb</Link>
+		</None>
+		<None Include="Assets\Models\rocket.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\rocket.glb</Link>
+		</None>
+		<None Include="Assets\Models\rocket_launcher_loaded.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\rocket_launcher_loaded.glb</Link>
+		</None>
+		<None Include="Assets\Models\rocket_launcher_unloaded.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\rocket_launcher_unloaded.glb</Link>
+		</None>
+		<None Include="Assets\Models\smoke_grenade.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\smoke_grenade.glb</Link>
+		</None>
+		<None Include="Assets\Models\plane.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\plane.glb</Link>
+		</None>
+		<None Include="Assets\Models\rdu.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\rdu.glb</Link>
+		</None>
+		<None Include="Assets\Models\ak47_mag.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\ak47_mag.glb</Link>
+		</None>
+		<None Include="Assets\Models\drum.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\drum.glb</Link>
+		</None>
+		<None Include="Assets\Models\m4a1_mag.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\m4a1_mag.glb</Link>
+		</None>
+		<None Include="Assets\Models\sniper_mag.glb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Models\sniper_mag.glb</Link>
+		</None>
+		<None Include="Assets\Icons\rdu.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\rdu.png</Link>
+		</None>
+		<None Include="Assets\Icons\ak47.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\ak47.png</Link>
+		</None>
+		<None Include="Assets\Icons\ak47_mag.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\ak47_mag.png</Link>
+		</None>
+		<None Include="Assets\Icons\sniper.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\sniper.png</Link>
+		</None>
+		<None Include="Assets\Icons\sniper_mag.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\sniper_mag.png</Link>
+		</None>
+		<None Include="Assets\Icons\m4a1.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\m4a1.png</Link>
+		</None>
+		<None Include="Assets\Icons\m4a1_mag.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\m4a1_mag.png</Link>
+		</None>
+		<None Include="Assets\Icons\flashbang.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\flashbang.png</Link>
+		</None>
+		<None Include="Assets\Icons\rocket.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\rocket.png</Link>
+		</None>
+		<None Include="Assets\Icons\rocket_launcher.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\rocket_launcher.png</Link>
+		</None>
+		<None Include="Assets\Icons\smoke_grenade.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\Icons\smoke_grenade.png</Link>
+		</None>
+		<None Include="Assets\VFX\WispySmoke01_8x8.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\WispySmoke01_8x8.tga</Link>
+		</None>
+		<None Include="Assets\VFX\WispySmoke03_8x8.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\WispySmoke03_8x8.tga</Link>
+		</None>
+		<None Include="Assets\VFX\FireBall02_8x8.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\FireBall02_8x8.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion00_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion00_5x5.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion01_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion01_5x5.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion01-light_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion01-light_5x5.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion01-nofire_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion01-nofire_5x5.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion01-light-nofire_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion01-light-nofire_5x5.tga</Link>
+		</None>
+		<None Include="Assets\VFX\Explosion02_5x5.tga">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Assets\VFX\Explosion02_5x5.tga</Link>
+		</None>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<Target Name="RemoveBundledS1Mapi" AfterTargets="Build">
+		<Delete Files="$(OutputPath)S1MAPI_Mono.dll" ContinueOnError="true" />
+		<Delete Files="$(OutputPath)S1MAPI_Il2Cpp.dll" ContinueOnError="true" />
+	</Target>
+
+	<!-- MelonAssemblyResolver looks for S1MAPI.dll, not S1MAPI_Mono.dll -->
+	<Target Name="EnsureS1MapiUserLib" AfterTargets="Build" Condition="'$(Configuration)'=='Mono' Or '$(Configuration)'=='CrossCompat'">
+		<Copy SourceFiles="$(S1MAPIMonoPath)" DestinationFiles="$(GamePath)\UserLibs\S1MAPI.dll" SkipUnchangedFiles="true" />
+	</Target>
+
+	<Target Name="EnsureS1MapiUserLibIl2Cpp" AfterTargets="Build" Condition="'$(Configuration)'=='Il2cpp'">
+		<Copy SourceFiles="$(S1MAPIIl2CppPath)" DestinationFiles="$(GamePath)\UserLibs\S1MAPI.dll" SkipUnchangedFiles="true" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="(tasklist | findstr /I &quot;Schedule.*I.exe&quot; &gt;nul &amp;&amp; taskkill /F /IM &quot;Schedule I.exe&quot; &amp;&amp; timeout /t 3 /nobreak &gt;nul) || echo Game not running&#xD;&#xA;for /L %%i in (1,1,5) do (COPY &quot;$(TargetPath)&quot; &quot;$(ModsPath)&quot; &amp;&amp; goto copied || timeout /t 1 /nobreak &gt;nul)&#xD;&#xA;:copied&#xD;&#xA;START &quot;&quot; &quot;$(GamePath)\Schedule I.exe&quot; --melonloader.launchdebugger --melonloader.debug" IgnoreExitCode="true" />
+	</Target>
+</Project>

@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net472</TargetFramework></PropertyGroup>
+  <ItemGroup><Reference Include="Assembly-CSharp"><HintPath>D:\Schedule 1 Dependencies\Mono\Schedule I_Data\Managed\Assembly-CSharp.dll</HintPath></Reference></ItemGroup>
+</Project>

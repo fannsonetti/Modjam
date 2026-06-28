@@ -1,0 +1,10 @@
+.idea/
+*.dll
+*.zip
+obj/
+bin/
+*.user
+.vs/
+
+local.*
+ci.*

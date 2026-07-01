@@ -125,6 +125,30 @@ internal static class ViewmodelAvatarBoneHelper
         ApplyOffset(_rightForeArm, profile.RightForeArmOffset, profile.RightForeArmEuler);
     }
 
+    internal static void ApplyKeyframeOffsets(ViewmodelAnimKeyframe keyframe)
+    {
+        if (!EnsureBonesResolved())
+            return;
+
+        ApplyOffset(_leftHand, keyframe.LeftHandOffset, keyframe.LeftHandEuler);
+        ApplyOffset(_rightHand, keyframe.RightHandOffset, keyframe.RightHandEuler);
+        ApplyOffset(_leftForeArm, keyframe.LeftForeArmOffset, keyframe.LeftForeArmEuler);
+        ApplyOffset(_rightForeArm, keyframe.RightForeArmOffset, keyframe.RightForeArmEuler);
+    }
+
+    internal static void PrepareRuntimeSampling()
+    {
+        var avatar = Singleton<ViewmodelAvatar>.Instance;
+        if (avatar == null)
+            return;
+
+        _animator = GetAnimator(avatar);
+        if (_animator != null)
+            ResolveBones(_animator);
+
+        GetSampleRoot();
+    }
+
     internal static void CaptureIntoProfile(ref ViewmodelProfile profile)
     {
         profile.LeftHandOffset = ReadOffset(_leftHand);

@@ -171,6 +171,9 @@
         <Compile Include="Utils\ViewmodelTimelineGui.cs" />
         <Compile Include="Utils\ViewmodelAnimatorClipResolver.cs" />
         <Compile Include="Utils\ViewmodelAnimatorBuilder.cs" />
+        <Compile Include="Utils\ViewmodelWeaponAnimSet.cs" />
+        <Compile Include="Utils\ViewmodelWeaponAnimatorFactory.cs" />
+        <Compile Include="Utils\WeaponViewmodelAnimations.cs" />
         <Compile Include="Utils\ViewmodelEditor.cs" />
         <Compile Include="Utils\ViewmodelEditorHost.cs" />
         <Compile Include="Utils\ViewmodelEditorFields.cs" />

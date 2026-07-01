@@ -73,6 +73,8 @@ internal static class ViewmodelEditor
     private static readonly Dictionary<int, ViewmodelProfile> _sessionProfiles = new();
     private static readonly Dictionary<int, float> _sessionAim = new();
     private static readonly Dictionary<int, float> _sessionMapRaise = new();
+    private static readonly Dictionary<int, ViewmodelWeaponAnimSet> _sessionAnimSets = new();
+    private static readonly Dictionary<string, ViewmodelWeaponAnimSet> _sessionAnimSetsByLabel = new();
     private static int _lastSessionWeaponId;
 
     internal static bool IsOpen => _isOpen;
@@ -128,6 +130,32 @@ internal static class ViewmodelEditor
 
     internal static float GetMapRaisePreview(PlaceholderAvatarWeaponEquippable weapon) =>
         IsBoundTo(weapon) ? _mapRaisePreviewBlend : 0f;
+
+    internal static ViewmodelWeaponAnimSet GetEffectiveAnimSet(PlaceholderAvatarWeaponEquippable weapon)
+    {
+        if (_isOpen && _boundPlaceholder == weapon)
+            return BuildAnimSetFromLibrary();
+
+        if (_sessionAnimSets.TryGetValue(weapon.GetInstanceID(), out var sessionSet) && sessionSet != null)
+            return sessionSet;
+
+        var label = weapon.GetViewmodelProfile().Label;
+        if (!string.IsNullOrEmpty(label) && _sessionAnimSetsByLabel.TryGetValue(label, out var labelSet) && labelSet != null)
+            return labelSet;
+
+        return WeaponViewmodelAnimations.TryGet(label);
+    }
+
+    private static ViewmodelWeaponAnimSet BuildAnimSetFromLibrary()
+    {
+        SaveAnimPreset(_animPresetIndex);
+
+        var set = ViewmodelWeaponAnimSet.FromLibrary(_animClipLibrary);
+        if (_animClip.Keyframes.Count > 0 && _animPresetIndex >= 0 && _animPresetIndex < _animPresets.Length)
+            set.SetClip(_animPresets[_animPresetIndex], CloneAnimClip(_animClip));
+
+        return set.HasAnyKeyframes ? set : null;
+    }
 
     private static void OnUpdate()
     {
@@ -325,6 +353,7 @@ internal static class ViewmodelEditor
             _editProfile = cached.Clone();
             _previewAim = _sessionAim.TryGetValue(key, out var aim) ? aim : weapon.EditorLiveAimAmount;
             _mapRaisePreviewBlend = _sessionMapRaise.TryGetValue(key, out var blend) ? blend : 0f;
+            LoadSessionAnimLibrary(key);
             return;
         }
 
@@ -332,6 +361,21 @@ internal static class ViewmodelEditor
         weapon.EditorSyncLiveViewmodel(ref _editProfile);
         _previewAim = weapon.EditorLiveAimAmount;
         _mapRaisePreviewBlend = 0f;
+        LoadSessionAnimLibrary(key);
+    }
+
+    private static void LoadSessionAnimLibrary(int weaponId)
+    {
+        _animClipLibrary.Clear();
+        if (!_sessionAnimSets.TryGetValue(weaponId, out var animSet) || animSet == null)
+        {
+            var label = _boundPlaceholder?.GetViewmodelProfile().Label;
+            if (string.IsNullOrEmpty(label) || !_sessionAnimSetsByLabel.TryGetValue(label, out animSet))
+                return;
+        }
+
+        foreach (var pair in animSet.Clips)
+            _animClipLibrary[pair.Key] = CloneAnimClip(pair.Value);
     }
 
     private static void BuildAnimPresetsFromWeapon(PlaceholderAvatarWeaponEquippable weapon)
@@ -912,6 +956,7 @@ internal static class ViewmodelEditor
         _sessionProfiles.Remove(key);
         _sessionAim.Remove(key);
         _sessionMapRaise.Remove(key);
+        _sessionAnimSets.Remove(key);
 
         if (_lastSessionWeaponId == key)
             _lastSessionWeaponId = 0;
@@ -931,6 +976,22 @@ internal static class ViewmodelEditor
         _sessionAim[key] = _previewAim;
         _sessionMapRaise[key] = _mapRaisePreviewBlend;
         _lastSessionWeaponId = key;
+
+        if (_boundPlaceholder != null && _boundPlaceholder.GetInstanceID() == key)
+        {
+            var animSet = BuildAnimSetFromLibrary();
+            if (animSet != null)
+            {
+                _sessionAnimSets[key] = animSet;
+                var label = _boundPlaceholder.GetViewmodelProfile().Label;
+                if (!string.IsNullOrEmpty(label))
+                    _sessionAnimSetsByLabel[label] = animSet.Clone();
+            }
+            else
+            {
+                _sessionAnimSets.Remove(key);
+            }
+        }
     }
 
     private static void ClearSessionStateForBoundWeapon()
@@ -988,17 +1049,8 @@ internal static class ViewmodelEditor
         $"hip={keyframe.HipPosition} LHand={keyframe.LeftHandOffset} RHand={keyframe.RightHandOffset} " +
         $"LFore={keyframe.LeftForeArmOffset} RFore={keyframe.RightForeArmOffset}";
 
-    private static ViewmodelAnimClip CloneAnimClip(ViewmodelAnimClip source)
-    {
-        var clone = new ViewmodelAnimClip
-        {
-            Name = source.Name,
-            SourceClipName = source.SourceClipName,
-            Duration = source.Duration,
-        };
-        clone.Keyframes.AddRange(source.Keyframes);
-        return clone;
-    }
+    private static ViewmodelAnimClip CloneAnimClip(ViewmodelAnimClip source) =>
+        source != null ? source.Clone() : new ViewmodelAnimClip();
 
     private static void CaptureKeyframe()
     {

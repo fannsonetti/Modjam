@@ -140,6 +140,18 @@ internal sealed class ViewmodelAnimClip
     internal float Duration = 0.5f;
     internal readonly List<ViewmodelAnimKeyframe> Keyframes = new();
 
+    internal ViewmodelAnimClip Clone()
+    {
+        var clone = new ViewmodelAnimClip
+        {
+            Name = Name,
+            SourceClipName = SourceClipName,
+            Duration = Duration,
+        };
+        clone.Keyframes.AddRange(Keyframes);
+        return clone;
+    }
+
     internal bool TrySample(float normalizedTime, out ViewmodelAnimKeyframe sample)
     {
         sample = default;

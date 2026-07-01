@@ -15,6 +15,7 @@ using ScheduleOne.UI;
 #endif
 
 using System.Collections;
+using System.Collections.Generic;
 using ScheduleOne.AvatarFramework.Equipping;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -111,6 +112,9 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
     private bool _fovOverridden;
     private Coroutine _thirdPersonSetupRoutine;
     private float _mapPoseBlend;
+    private RuntimeAnimatorController _baseAnimatorController;
+    private readonly List<UnityEngine.Object> _animOverrideAssets = new();
+    private bool _usesCustomAnimOverrides;
 
     protected abstract string TemplateItemId { get; }
     protected abstract PlaceholderVisuals Visuals { get; }
@@ -129,6 +133,9 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
     protected virtual float? GetScopedFov() => null;
 
     internal virtual ViewmodelProfile GetViewmodelProfile() => ViewmodelProfile.DefaultPlaceholderBar;
+
+    internal virtual ViewmodelWeaponAnimSet GetViewmodelAnimSet() =>
+        WeaponViewmodelAnimations.TryGet(GetViewmodelProfile().Label);
 
     private ViewmodelProfile ActiveProfile => ViewmodelEditor.GetEffectiveProfile(this);
 
@@ -304,6 +311,8 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
 
     private void EquipWithAvatarHands(ItemInstance item)
     {
+        ApplyViewmodelAnimatorOverrides();
+
 #if IL2CPP
         transform.SetParent(Singleton<ViewmodelAvatar>.Instance.RightHandContainer);
         if (AnimatorController != null)
@@ -323,6 +332,45 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
 #else
         base.Equip(item);
 #endif
+    }
+
+    private void ApplyViewmodelAnimatorOverrides()
+    {
+        ClearViewmodelAnimatorOverrides();
+
+        if (!UsesAvatarHands || AnimatorController == null)
+            return;
+
+        _baseAnimatorController = AnimatorController;
+        var animSet = ViewmodelEditor.GetEffectiveAnimSet(this) ?? GetViewmodelAnimSet();
+        if (animSet == null || !animSet.HasAnyKeyframes)
+            return;
+
+        var avatar = Singleton<ViewmodelAvatar>.Instance;
+        if (avatar != null)
+            avatar.SetVisibility(true);
+
+        var result = ViewmodelWeaponAnimatorFactory.TryCreateOverride(this, _baseAnimatorController, animSet);
+        if (!result.Succeeded)
+            return;
+
+        AnimatorController = result.Controller;
+        _animOverrideAssets.AddRange(result.Assets);
+        _usesCustomAnimOverrides = true;
+    }
+
+    private void ClearViewmodelAnimatorOverrides()
+    {
+        for (var i = 0; i < _animOverrideAssets.Count; i++)
+        {
+            var asset = _animOverrideAssets[i];
+            if (asset != null)
+                UnityEngine.Object.Destroy(asset);
+        }
+
+        _animOverrideAssets.Clear();
+        _usesCustomAnimOverrides = false;
+        _baseAnimatorController = null;
     }
 
     private void EquipHandsFree(ItemInstance item)
@@ -392,7 +440,8 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
         if (UsesAvatarHands)
         {
             ViewmodelAvatarHandHelper.CaptureBaseline();
-            ApplyAvatarHandOffsets(GetViewmodelProfile());
+            if (!_usesCustomAnimOverrides)
+                ApplyAvatarHandOffsets(GetViewmodelProfile());
         }
         else
         {
@@ -417,6 +466,7 @@ public abstract class PlaceholderAvatarWeaponEquippable : Equippable_AvatarViewm
             ActiveEquipped = null;
 
         ViewmodelEditor.ClearSession(this);
+        ClearViewmodelAnimatorOverrides();
         ViewmodelAvatarHandHelper.Reset();
         OnStopAim();
         StopAim();

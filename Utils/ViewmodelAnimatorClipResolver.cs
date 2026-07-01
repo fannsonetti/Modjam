@@ -7,18 +7,36 @@ namespace MoreWeapons.Utils;
 
 internal static class ViewmodelAnimatorClipResolver
 {
-    internal static AnimationClip ResolveSourceClip(PlaceholderAvatarWeaponEquippable weapon, string presetName)
+    internal static AnimationClip ResolveSourceClip(PlaceholderAvatarWeaponEquippable weapon, string presetName) =>
+        ResolveSourceClip(ViewmodelAvatarBoneHelper.Animator?.runtimeAnimatorController, weapon, presetName, null);
+
+    internal static AnimationClip ResolveSourceClip(
+        RuntimeAnimatorController controller,
+        PlaceholderAvatarWeaponEquippable weapon,
+        string presetName,
+        string preferredClipName)
     {
-        var animator = ViewmodelAvatarBoneHelper.Animator;
-        if (animator?.runtimeAnimatorController == null)
+        if (controller == null)
             return null;
 
-        var clips = animator.runtimeAnimatorController.animationClips;
+        var clips = controller.animationClips;
         if (clips == null || clips.Length == 0)
             return null;
 
+        if (!string.IsNullOrEmpty(preferredClipName))
+        {
+            foreach (var clip in clips)
+            {
+                if (clip != null && clip.name == preferredClipName)
+                    return clip;
+            }
+        }
+
         foreach (var hint in GetSearchHints(presetName, weapon))
         {
+            if (string.IsNullOrEmpty(hint))
+                continue;
+
             foreach (var clip in clips)
             {
                 if (clip == null)
